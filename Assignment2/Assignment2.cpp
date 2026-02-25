@@ -110,4 +110,13 @@ int main()
     cout << endl << "linear_search ASSERTS PASSED" << endl;
 
     search_for_targ(arr, num_of_elements);
+
+    //Question 7 - Bubble Sort
+    cout << "---------------------------Question 7---------------------------" << endl;
+    bubble_sort(arr, num_of_elements);
+
+    for (int i = 0; i < num_of_elements-1; i++) {
+            assert(arr[i] <= arr[i + 1]);
+    }
+    cout << "bubble_sort ASSERTS PASSED" << endl;
 }
