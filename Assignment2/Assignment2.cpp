@@ -295,6 +295,26 @@ struct Mob {
     }
 };
 
+enum WinState {
+    PLAYING,
+    WIN,
+    LOSE,
+    DRAW
+};
+
+WinState get_win_state(Mob mob1, Mob mob2) {
+    if (mob1.health <= 0 && mob2.health <= 0) {
+        return DRAW;
+    }
+    else if (mob1.health > 0 && mob2.health <= 0) {
+        return LOSE;
+    }
+    else if (mob1.health <= 0 && mob2.health > 0) {
+        return WIN;
+    }
+    else { return PLAYING; }
+}
+
 
 
 int main()
