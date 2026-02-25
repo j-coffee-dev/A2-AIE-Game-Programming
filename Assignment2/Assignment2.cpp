@@ -152,4 +152,12 @@ int main()
             assert(arr[i] <= arr[i + 1]);
     }
     cout << "bubble_sort ASSERTS PASSED" << endl;
+
+    //Question 8 - Binary Search
+    cout << "---------------------------Question 8---------------------------" << endl;
+    assert(binary_search(arr, num_of_elements, 11) == 4);
+    assert(binary_search(arr, num_of_elements, 23) == 8);
+    assert(binary_search(arr, num_of_elements, 97) == 19);
+    assert(binary_search(arr, num_of_elements, 88) == -1);
+    cout << "binary_search ASSERTS PASSED" << endl;
 }
