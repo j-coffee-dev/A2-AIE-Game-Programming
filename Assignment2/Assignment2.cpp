@@ -5,6 +5,7 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <random>
 using namespace std;
 
 int linear_search(int* array, int size, int target) {
@@ -222,7 +223,7 @@ struct Mob {
 
         case(FIREBALL):
             if (next_strike_crit) {
-                mob.add_health(-damage_rating * critical_multiplier);
+                mob.add_health(static_cast <int> (damage_rating * critical_multiplier));
                 if (print_details) { cout << "-> " << name << " attacked " << mob.name << " with Fireball! " << "(" << damage_rating << " damage)" << " - \033[33mCRITICAL!\033[0m" << endl; }
             }
             else {
@@ -248,7 +249,7 @@ struct Mob {
             if (dot_next_attack) {
 
                 //Vicious Slice has a chance to inflict 2% max health as damage over time for the next 6 attacks.
-                mob.health_over_time = -0.02 * mob.max_health;
+                mob.health_over_time = static_cast <int> (-0.02 * mob.max_health);
                 mob.h_timer = 6000;
                 if (print_details) { cout << " \033[33mVicious Slice applied a damage over time to " << mob.name << " this round!\033[0m" << endl; }
             }
@@ -286,7 +287,7 @@ struct Mob {
 
     void apply_special_effect() {
         if (name == "Hogger") {
-            health_over_time = 0.05 * max_health;
+            health_over_time = static_cast <int> (0.05 * max_health);
             h_timer = 2000;
         }
         if (name == "Level 10 Human Mage") {
@@ -313,6 +314,25 @@ WinState get_win_state(Mob mob1, Mob mob2) {
         return WIN;
     }
     else { return PLAYING; }
+}
+
+WinState mob_battle(Mob& mob1, Mob& mob2, bool pause_on, const unsigned int seed, bool print_details) {
+
+    WinState winstate = PLAYING;
+    mt19937 generator(seed);
+    Mob* mobs[2] = { &mob1, &mob2 };
+
+    uniform_int_distribution<int> uniform_damage_rating(10, 25);
+    uniform_int_distribution<int> uniform_dist(0, 1);
+    bernoulli_distribution special_effect(0.3);
+    bernoulli_distribution bernoulli_dist_crit_mob2(mob2.crit_strike_chance);
+    bernoulli_distribution bernoulli_dist_dot_mob1(mob1.dot_chance);
+    bernoulli_distribution bernoulli_dist_dot_mob2(mob2.dot_chance);
+
+    int time_step = 1000;
+    int round = 1;
+
+    return winstate;
 }
 
 
