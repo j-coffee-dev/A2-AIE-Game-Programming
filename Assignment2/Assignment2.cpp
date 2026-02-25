@@ -25,7 +25,7 @@ int linear_search(int* array, int size, int target) {
     }
     return -1;
 }
-void search_for_targ(int* array, int size) {
+void search_for_targ_linear(int* array, int size) {
     /////////////////////////////////////////////////
     /// @brief  Loops through user input and searches the array 
     ///         for the input using linear_search.
@@ -39,7 +39,7 @@ void search_for_targ(int* array, int size) {
 
     string target;
     int target_int;
-    cout << "Continue entering values to search the array for (type Q to quit): " << endl;
+    cout << "linear_search: Continue entering values to search the array for (type Q to quit): " << endl;
 
     while(true){
         cin >> target;
@@ -130,6 +130,36 @@ int binary_search(int* array, int size, int target) {
     return -1;
 }
 
+void search_for_targ_binary(int* array, int size) {
+    /////////////////////////////////////////////////
+    /// @brief  Loops through user input and searches the array 
+    ///         for the input using binary_search
+    ///         Print to let user know if that element was found.
+    ///
+    /// @param  array  : A pointer to the array to be searched.
+    /// @param  size   : The number of elements in array.
+    /// 
+    /// @return  Nothing.
+    /////////////////////////////////////////////////
+
+    string target;
+    int target_int;
+    cout << "binary_search: Continue entering values to search the array for (type Q to quit): " << endl;
+
+    while (true) {
+        cin >> target;
+        try {
+            target_int = stoi(target);
+        }
+        catch (...) {
+            break;
+        }
+        int result = binary_search(array, size, target_int);
+        if (result == -1) { cout << "Result not found." << endl; }
+        else { cout << "Result found at index " << result << endl; }
+    }
+}
+
 int main()
 {
     //Question 6 - Linear Search
@@ -142,7 +172,7 @@ int main()
     assert(linear_search(arr, num_of_elements, 88) == -1);
     cout << endl << "linear_search ASSERTS PASSED" << endl;
 
-    search_for_targ(arr, num_of_elements);
+    search_for_targ_linear(arr, num_of_elements);
 
     //Question 7 - Bubble Sort
     cout << "---------------------------Question 7---------------------------" << endl;
@@ -160,4 +190,6 @@ int main()
     assert(binary_search(arr, num_of_elements, 97) == 19);
     assert(binary_search(arr, num_of_elements, 88) == -1);
     cout << "binary_search ASSERTS PASSED" << endl;
+
+    search_for_targ_binary(arr, num_of_elements);
 }
