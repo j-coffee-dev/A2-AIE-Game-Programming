@@ -272,6 +272,17 @@ struct Mob {
         }
         h_timer -= step;
     }
+
+    void determine_attack_style(int idx) {
+        switch (idx) {
+        case (0):
+            attack_skill = VICIOUS_SLICE;
+            break;
+        case (1):
+            attack_skill = REGULAR;
+            break;
+        }
+    }
 };
 
 
