@@ -97,6 +97,39 @@ void bubble_sort(int* array, int size) {
     } while (swapped);
 }
 
+int binary_search(int* array, int size, int target) {
+    /////////////////////////////////////////////////
+    /// @brief  Searches a sorted integer array for a target integer
+    ///         using the binary method.
+    ///
+    /// @param  array  : The sorted array to be searched.
+    /// @param  size   : Size of the array.
+    /// @param  target : Target element to search for.
+    /// 
+    /// @return  Return index where target is, else return -1.
+    /////////////////////////////////////////////////
+
+    for (int i = 0; i < size - 1; i++) {
+        assert(array[i] <= array[i + 1]);
+    }
+
+    int L = 0;
+    int R = size;
+    while (L <= R) {
+        int idx = static_cast <int> (L + R) / 2;
+        if (array[idx] == target) {
+            return idx;
+        }
+        else if (array[idx] < target) {
+            L = idx + 1;
+        }
+        else if (array[idx] > target) {
+            R = idx - 1;
+        }
+    }
+    return -1;
+}
+
 int main()
 {
     //Question 6 - Linear Search
