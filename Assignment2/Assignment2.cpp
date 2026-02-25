@@ -192,4 +192,15 @@ int main()
     cout << "binary_search ASSERTS PASSED" << endl;
 
     search_for_targ_binary(arr, num_of_elements);
+
+    //Question 9 - Pointers
+    cout << "---------------------------Question 9---------------------------" << endl;
+    int a_after = 1;
+    int b_after = 53;
+    swap_integers(a_after, b_after);
+
+    int a_before = 1;
+    int b_before = 53;
+    assert((a_before == b_after) && (a_after == b_before));
+    cout << "swap_integer ASSERTS PASSED" << endl;
 }
