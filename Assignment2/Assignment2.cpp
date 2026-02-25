@@ -10,7 +10,7 @@ int linear_search(int* array, int size, int target) {
     /// @brief  Takes in an array, if target is an element of the array returns the index 
     ///         index where it first occurs, else return -1.
     ///
-    /// @param  array  : A pointer to the first element of an array of type int.
+    /// @param  array  : A pointer to the array to be searched.
     /// @param  size   : The number of elements in array.
     /// @param  target : Element to search for.
     /// 
@@ -31,7 +31,7 @@ void search_for_targ(int* array, int size) {
     ///         for the input using linear_search.
     ///         Print to let user know if that element was found.
     ///
-    /// @param  array  : A pointer to the first element of an array of type int.
+    /// @param  array  : A pointer to the array to be searched.
     /// @param  size   : The number of elements in array.
     /// 
     /// @return  Nothing.
@@ -53,6 +53,48 @@ void search_for_targ(int* array, int size) {
         if (result == -1) { cout << "Result not found." << endl; }
         else { cout << "Result found at index " << result << endl; }
     }
+}
+
+void swap_integers(int& a, int& b) {
+    /////////////////////////////////////////////////
+    /// @brief  Swaps the values of two integers.
+    ///
+    /// @param  a : First integer to be swapped.
+    /// @param  b : Second integer to be swapped.
+    /// 
+    /// @return  No return. Original variables are modified
+    ///          as they are passed by reference.
+    /////////////////////////////////////////////////
+
+    int temp;
+    temp = a;
+    a = b;
+    b = temp;
+}
+
+void bubble_sort(int* array, int size) {
+    /////////////////////////////////////////////////
+    /// @brief  Sorts an integer array from smallest
+    ///         to largest.
+    ///
+    /// @param  array : The array to be sorted.
+    /// @param  size  : Size of the sorted array.
+    /// 
+    /// @return  No return. Original array is modified
+    ///          via swap_integers.
+    /////////////////////////////////////////////////
+
+    bool swapped = true;
+
+    do {
+        swapped = false;
+        for (int i = 0; i < size - 1; i++) {
+            if (array[i] > array[i + 1]) {
+                swap_integers(array[i], array[i + 1]);
+                swapped = true;
+            }
+        }
+    } while (swapped);
 }
 
 int main()
