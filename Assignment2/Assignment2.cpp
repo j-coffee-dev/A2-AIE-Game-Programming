@@ -283,6 +283,16 @@ struct Mob {
             break;
         }
     }
+
+    void apply_special_effect() {
+        if (name == "Hogger") {
+            health_over_time = 0.05 * max_health;
+            h_timer = 2000;
+        }
+        if (name == "Level 10 Human Mage") {
+            dodge_next_attack = true;
+        }
+    }
 };
 
 
