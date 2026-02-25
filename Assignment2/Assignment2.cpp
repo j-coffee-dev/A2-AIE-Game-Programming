@@ -206,6 +206,8 @@ struct Mob {
     }
 
     void attack(Mob& mob, int step, bool pause_on, bool print_details) {
+
+        //Logic for attack dodge
         if (mob.dodge_next_attack) {
             if (print_details) { cout << "-> " << "\033[33m" << mob.name << " dodged the attack from " << name << ". \033[0m" << endl; }
             mob.dodge_next_attack = false;
@@ -213,6 +215,48 @@ struct Mob {
                 this_thread::sleep_for(chrono::milliseconds(step));
             }
             return;
+        }
+
+        //Switch on basic attacks defined by AttackType enum
+        switch (attack_skill) {
+
+        case(FIREBALL):
+            if (next_strike_crit) {
+                mob.add_health(-damage_rating * critical_multiplier);
+                if (print_details) { cout << "-> " << name << " attacked " << mob.name << " with Fireball! " << "(" << damage_rating << " damage)" << " - \033[33mCRITICAL!\033[0m" << endl; }
+            }
+            else {
+                mob.add_health(-damage_rating);
+                if (print_details) { cout << "-> " << name << " attacked " << mob.name << " with Fireball! " << " (" << damage_rating << " damage)" << endl; }
+            }
+            if (dot_next_attack) {
+                //Mage's Fireball has a chance to inflict 50 damage in each round as a status effect for the next 4 attacks.
+                mob.health_over_time = -50;
+                mob.h_timer = 4000;
+                if (print_details) { cout << "\033[33mFireball applied a damage over time to " << mob.name << " this round!\033[0m" << endl; }
+            }
+            break;
+
+        case(REGULAR):
+            mob.add_health(-damage_rating);
+            if (print_details) { cout << "-> " << name << " attacked " << mob.name << " with a regular attack. " << "(" << damage_rating << " damage)" << endl; }
+            break;
+
+        case(VICIOUS_SLICE):
+            mob.add_health(-damage_rating);
+            if (print_details) { cout << "-> " << name << " attacked " << mob.name << " with Vicious Slice! " << "(" << damage_rating << " damage)" << endl; }
+            if (dot_next_attack) {
+
+                //Vicious Slice has a chance to inflict 2% max health as damage over time for the next 6 attacks.
+                mob.health_over_time = -0.02 * mob.max_health;
+                mob.h_timer = 6000;
+                if (print_details) { cout << " \033[33mVicious Slice applied a damage over time to " << mob.name << " this round!\033[0m" << endl; }
+            }
+            break;        
+        }
+
+        if (pause_on) {
+            this_thread::sleep_for(chrono::milliseconds(step));
         }
     }
 };
