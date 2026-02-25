@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cassert>
 #include <string>
+#include <chrono>
+#include <thread>
 using namespace std;
 
 int linear_search(int* array, int size, int target) {
@@ -197,6 +199,21 @@ struct Mob {
         crit_strike_chance = crit_chance;
         dot_chance = dot_prob;
         attack_skill = default_attack;
+    }
+
+    void add_health(int amount) {
+        health += amount;
+    }
+
+    void attack(Mob& mob, int step, bool pause_on, bool print_details) {
+        if (mob.dodge_next_attack) {
+            if (print_details) { cout << "-> " << "\033[33m" << mob.name << " dodged the attack from " << name << ". \033[0m" << endl; }
+            mob.dodge_next_attack = false;
+            if (pause_on) {
+                this_thread::sleep_for(chrono::milliseconds(step));
+            }
+            return;
+        }
     }
 };
 
