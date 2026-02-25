@@ -160,6 +160,48 @@ void search_for_targ_binary(int* array, int size) {
     }
 }
 
+enum AttackType {
+    VICIOUS_SLICE,
+    REGULAR,
+    FIREBALL
+};
+
+struct Mob {
+    string name = "placeholder";
+
+    AttackType attack_skill = VICIOUS_SLICE;
+    int damage_rating = 0;
+
+
+    int max_health = -1;
+    int health = -1;
+    int health_over_time = 0;
+    int h_timer = 0;
+
+    bool dodge_next_attack = false;
+
+    bool next_strike_crit = false;
+    float critical_multiplier = 1.0;
+    float crit_strike_chance = 0.0;
+
+    bool dot_next_attack = false;
+    float dot_chance = 0.0;
+
+
+
+    void config(string initial_name, int max_hp, int hp, float crit_mult, float crit_chance, float dot_prob, AttackType default_attack) {
+        name = initial_name;
+        max_health = max_hp;
+        health = hp;
+        critical_multiplier = crit_mult;
+        crit_strike_chance = crit_chance;
+        dot_chance = dot_prob;
+        attack_skill = default_attack;
+    }
+};
+
+
+
 int main()
 {
     //Question 6 - Linear Search
