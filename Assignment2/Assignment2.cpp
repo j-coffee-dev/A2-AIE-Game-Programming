@@ -259,6 +259,19 @@ struct Mob {
             this_thread::sleep_for(chrono::milliseconds(step));
         }
     }
+
+    void update_status(int step, bool print_details) {
+        if (h_timer > 0) {
+            add_health(health_over_time);
+            if (health_over_time < 0) {
+                if (print_details) { cout << "\033[31m" << "-> " << name << " took " << -health_over_time << " damage from a status effect from a previous attack. (Remaining time: " << (h_timer - step) / 1000 << " rounds)" << "\033[0m" << endl; }
+            }
+            else if (health_over_time > 0) {
+                if (print_details) { cout << "\033[32m" << "-> " << name << " gained " << health_over_time << " from a status effect. (Remaining time: " << (h_timer - step) / 1000 << " rounds)" << "\033[0m" << endl; }
+            }
+        }
+        h_timer -= step;
+    }
 };
 
 
