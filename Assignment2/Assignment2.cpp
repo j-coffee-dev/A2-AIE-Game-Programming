@@ -1,6 +1,7 @@
 //Assignment 2 for AIE Game Programming Course - 2026
 
 #include <iostream>
+#include <cassert>
 using namespace std;
 
 int linear_search(int* array, int size, int target) {
@@ -25,4 +26,12 @@ int linear_search(int* array, int size, int target) {
 
 int main()
 {
+    //Question 6 - Linear Search
+    const int num_of_elements = 20;
+    int arr[num_of_elements] = { 67,13,3,89,43,2,19,71,5,61,97,7,37,31,17,11,83,53,23,29 };
+    assert(linear_search(arr, num_of_elements, 3) == 2);
+    assert(linear_search(arr, num_of_elements, 7) == 11);
+    assert(linear_search(arr, num_of_elements, 67) == 0);
+    assert(linear_search(arr, num_of_elements, 88) == -1);
+    cout << "ASSERTS PASSED: LINEAR SEARCH ELEMENTS ARE IN CORRECT LOCATIONS." << endl;
 }
