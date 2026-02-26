@@ -339,17 +339,16 @@ WinState mob_battle(Mob& mob1, Mob& mob2, bool pause_on, const unsigned int seed
 
         //Randomly determine damage amount for Hogger (Uniform: Equal probability of damage rating on integers in the interval [10,25])
         mob1.damage_rating = uniform_damage_rating(generator);
+
         //Randomly determine damage amount for Hogger (Uniform: Equal probability of damage rating on integers in the interval [60,150]) 
         mob2.damage_rating = 6 * uniform_damage_rating(generator);
 
-
-        //Randomly determine one mob to get a special effect. (Bernoulli: On average, in 3 out of 10 attacks one mob will get their special effect) 
+        //Randomly determine one mob to get a special effect (Bernoulli: On average, in 3 out of 10 attacks one mob will get their special effect) 
         int idx_exp = uniform_dist(generator);
         bool se_sample = special_effect(generator);
         if (se_sample) {
             (*mobs[idx_exp]).apply_special_effect();
         }
-
 
         //Randomly determine if the player will crit Hogger this round (Bernoulli: Player will crit with probability mob2.crit_strike_chance) 
         mob2.next_strike_crit = bernoulli_dist_crit_mob2(generator);
@@ -359,7 +358,7 @@ WinState mob_battle(Mob& mob1, Mob& mob2, bool pause_on, const unsigned int seed
         mob1.dot_next_attack = bernoulli_dist_dot_mob1(generator);
         mob2.dot_next_attack = bernoulli_dist_dot_mob1(generator);
 
-        //Randomly determine who attacks first (Uniform: Equal probability of each mob attacking first).
+        //Randomly determine who attacks first (Uniform: Equal probability of each mob attacking first)
         int idx = uniform_dist(generator);
         int other_idx = (idx + 1) % 2;
 
@@ -390,10 +389,11 @@ WinState mob_battle(Mob& mob1, Mob& mob2, bool pause_on, const unsigned int seed
             break;
         }
 
+        //Randomly determine who's dots are applied first (Uniform: Equal probability of each mob applying their dot first)
         idx = uniform_dist(generator);
         other_idx = (idx + 1) % 2;
-        (*mobs[idx]).update_status(time_step, print_details);
 
+        (*mobs[idx]).update_status(time_step, print_details);
         //Check if applied dots killed the mob
         winstate = get_win_state(*mobs[idx], *mobs[other_idx]);
         if (winstate != PLAYING) {
@@ -401,7 +401,6 @@ WinState mob_battle(Mob& mob1, Mob& mob2, bool pause_on, const unsigned int seed
         }
 
         (*mobs[other_idx]).update_status(time_step, print_details);
-
         //Check if applied dots killed the mob
         winstate = get_win_state(*mobs[idx], *mobs[other_idx]);
         if (winstate != PLAYING) {
@@ -417,6 +416,40 @@ WinState mob_battle(Mob& mob1, Mob& mob2, bool pause_on, const unsigned int seed
     if (print_details) { cout << "-----------------------------------------------------------------------------------------------------------" << endl; }
 
     return winstate;
+}
+
+void announce_win(Mob mob1, Mob mob2, WinState winstate) {
+    switch (winstate) {
+    case(DRAW):
+        cout << "It was a draw!" << endl;
+        break;
+    case(LOSE):
+        cout << "****************************** " << mob1.name << " won this match!" << " ******************************" << endl;
+        break;
+    case(WIN):
+        cout << "****************************** " << mob2.name << " won this match!" << " ******************************" << endl;
+        break;
+    }
+}
+
+void print_battle_statistics(vector <WinState> win_array) {
+    int num_of_wins = 0;
+    int num_of_draws = 0;
+    int num_of_battles = win_array.size();
+    for (WinState winstate : win_array) {
+        if (winstate == WIN) {
+            num_of_wins += 1;
+        }
+        else if (winstate == DRAW) {
+            num_of_draws += 1;
+        }
+    }
+    cout << endl << "---------------------------------------------BATTLE STATISTICS---------------------------------------------" << endl;
+    cout << "Level 10 Human Mage won " << to_string(num_of_wins) << " out of " << to_string(num_of_battles) << " battles." << endl;
+    cout << "Hogger won " << to_string(num_of_battles - num_of_wins - num_of_draws) << " out of " << to_string(num_of_battles) << " battles." << endl;
+    cout << "There were " << to_string(num_of_draws) << " draws out of " << to_string(num_of_battles) << " battles." << endl;
+    cout << "...as expected, Hogger is brutal." << endl;
+    cout << "-----------------------------------------------------------------------------------------------------------";
 }
 
 
@@ -464,4 +497,47 @@ int main()
     int b_before = 53;
     assert((a_before == b_after) && (a_after == b_before));
     cout << "swap_integer ASSERTS PASSED" << endl;
+
+    //Question 10 - Mob battle
+    cout << "---------------------------Question 10---------------------------" << endl;
+
+    //Config form: (name, maxhp, currenthp, crit multiplier, crit chance, dot chance, default attack skill)
+    Mob mob1;
+    mob1.config("Hogger", 666, 666, 1.0, 0, 0.1, AttackType::REGULAR);
+
+    Mob mob2;
+    mob2.config("Level 10 Human Mage", 100, 100, 1.2, 0.2, 0.1, AttackType::FIREBALL);
+
+    const int num_of_battles = 100;
+    bool pause_on = false;
+    bool print_details = false;
+    unsigned int seed = 0;
+    vector<WinState> win_array;
+    for (int i = 0; i < num_of_battles; i++) {
+        //Reset mob health for each battle
+        mob1.health = 666;
+        mob2.health = 100;
+
+        //Give a new random seed so that each battle is different
+        seed = i;
+
+        if (i == 3) {
+            cout << "----------Press any key to begin printing details of one battle between the two mobs.----------" << endl;
+            //Wait for user input >nul ensures the system string is not printed.
+            system("pause >nul");
+            print_details = true;
+            pause_on = true;
+        }
+        else {
+            print_details = false;
+            pause_on = false;
+        }
+
+        WinState winstate = mob_battle(mob1, mob2, pause_on, seed, print_details);
+        if (i == 3) {
+            announce_win(mob1, mob2, winstate);
+        }
+        win_array.push_back(winstate);
+    }
+    print_battle_statistics(win_array);
 }
