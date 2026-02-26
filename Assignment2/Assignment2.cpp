@@ -223,12 +223,12 @@ struct Mob {
 
         case(FIREBALL):
             if (next_strike_crit) {
-                mob.add_health(static_cast <int> (damage_rating * critical_multiplier));
-                if (print_details) { cout << "-> " << name << " attacked " << mob.name << " with Fireball! " << "(" << damage_rating << " damage)" << " - \033[33mCRITICAL!\033[0m" << endl; }
+                mob.add_health(-static_cast <int> (damage_rating * critical_multiplier));
+                if (print_details) { cout << "-> " << name << " attacked " << mob.name << " with Fireball! " << "(" << static_cast <int> (damage_rating*critical_multiplier) << " damage)" << " - \033[33mCRITICAL!\033[0m" << endl; }
             }
             else {
                 mob.add_health(-damage_rating);
-                if (print_details) { cout << "-> " << name << " attacked " << mob.name << " with Fireball! " << " (" << damage_rating << " damage)" << endl; }
+                if (print_details) { cout << "-> " << name << " attacked " << mob.name << " with Fireball. " << " (" << damage_rating << " damage)" << endl; }
             }
             if (dot_next_attack) {
                 //Mage's Fireball has a chance to inflict 50 damage in each round as a status effect for the next 4 attacks.
@@ -249,7 +249,7 @@ struct Mob {
             if (dot_next_attack) {
 
                 //Vicious Slice has a chance to inflict 2% max health as damage over time for the next 6 attacks.
-                mob.health_over_time = static_cast <int> (-0.02 * mob.max_health);
+                mob.health_over_time = -static_cast <int> (0.02 * mob.max_health);
                 mob.h_timer = 6000;
                 if (print_details) { cout << " \033[33mVicious Slice applied a damage over time to " << mob.name << " this round!\033[0m" << endl; }
             }
@@ -420,14 +420,14 @@ WinState mob_battle(Mob& mob1, Mob& mob2, bool pause_on, const unsigned int seed
 
 void announce_win(Mob mob1, Mob mob2, WinState winstate) {
     switch (winstate) {
+    case(WIN):
+        cout << "****************************** " << mob2.name << " won this match!" << " ******************************" << endl;
+        break;
     case(DRAW):
         cout << "It was a draw!" << endl;
         break;
     case(LOSE):
         cout << "****************************** " << mob1.name << " won this match!" << " ******************************" << endl;
-        break;
-    case(WIN):
-        cout << "****************************** " << mob2.name << " won this match!" << " ******************************" << endl;
         break;
     }
 }
@@ -513,6 +513,9 @@ int main()
     bool print_details = false;
     unsigned int seed = 0;
     vector<WinState> win_array;
+    cout << "Out of the " << num_of_battles << " battles which one would you like to watch?" << endl;
+    int battle_to_watch = 5;
+    cin >> battle_to_watch;
     for (int i = 0; i < num_of_battles; i++) {
         //Reset mob health for each battle
         mob1.health = 666;
@@ -521,8 +524,8 @@ int main()
         //Give a new random seed so that each battle is different
         seed = i;
 
-        if (i == 3) {
-            cout << "----------Press any key to begin printing details of one battle between the two mobs.----------" << endl;
+        if (i == battle_to_watch) {
+            cout << "----------Press any key to begin printing details of battle number " << to_string(battle_to_watch) << " between the two mobs.----------" << endl;
             //Wait for user input >nul ensures the system string is not printed.
             system("pause >nul");
             print_details = true;
@@ -532,9 +535,8 @@ int main()
             print_details = false;
             pause_on = false;
         }
-
         WinState winstate = mob_battle(mob1, mob2, pause_on, seed, print_details);
-        if (i == 3) {
+        if (i == battle_to_watch) {
             announce_win(mob1, mob2, winstate);
         }
         win_array.push_back(winstate);
