@@ -332,6 +332,90 @@ WinState mob_battle(Mob& mob1, Mob& mob2, bool pause_on, const unsigned int seed
     int time_step = 1000;
     int round = 1;
 
+    while (winstate == PLAYING) {
+        //Randomly determine Hogger's attack style this turn (Uniform probability of either attack)
+        int hogger_attack_idx = uniform_dist(generator);
+        mob1.determine_attack_style(hogger_attack_idx);
+
+        //Randomly determine damage amount for Hogger (Uniform: Equal probability of damage rating on integers in the interval [10,25])
+        mob1.damage_rating = uniform_damage_rating(generator);
+        //Randomly determine damage amount for Hogger (Uniform: Equal probability of damage rating on integers in the interval [60,150]) 
+        mob2.damage_rating = 6 * uniform_damage_rating(generator);
+
+
+        //Randomly determine one mob to get a special effect. (Bernoulli: On average, in 3 out of 10 attacks one mob will get their special effect) 
+        int idx_exp = uniform_dist(generator);
+        bool se_sample = special_effect(generator);
+        if (se_sample) {
+            (*mobs[idx_exp]).apply_special_effect();
+        }
+
+
+        //Randomly determine if the player will crit Hogger this round (Bernoulli: Player will crit with probability mob2.crit_strike_chance) 
+        mob2.next_strike_crit = bernoulli_dist_crit_mob2(generator);
+
+
+        //Randomly determine if each player will apply their damage over time effects this round (Bernoulli: Effects applied with probability mobi.dot_chance) 
+        mob1.dot_next_attack = bernoulli_dist_dot_mob1(generator);
+        mob2.dot_next_attack = bernoulli_dist_dot_mob1(generator);
+
+        //Randomly determine who attacks first (Uniform: Equal probability of each mob attacking first).
+        int idx = uniform_dist(generator);
+        int other_idx = (idx + 1) % 2;
+
+        if (print_details) {
+            cout << "-----------------------------------------------------------------------------------------------------------" << endl;
+            cout << "ATTACK ROUND: " << round << " " << endl;
+            cout << "CURRENT STATS: " << mob1.name << " has \033[31m" << mob1.health << "\033[0m health. " << mob2.name << " has \033[32m" << mob2.health << "\033[0m health." << endl;
+            cout << "-----------------------------------------------------------------------------------------------------------" << endl;
+        }
+
+        if (pause_on) {
+            this_thread::sleep_for(chrono::milliseconds(2 * time_step));
+        }
+
+        (*mobs[idx]).attack((*mobs[other_idx]), time_step, pause_on, print_details);
+
+        //Check if the first attacking mob killed other mob
+        winstate = get_win_state(*mobs[idx], *mobs[other_idx]);
+        if (winstate != PLAYING) {
+            break;
+        }
+
+        (*mobs[other_idx]).attack((*mobs[idx]), time_step, pause_on, print_details);
+
+        //Check if the second attacking mob killed other mob
+        winstate = get_win_state(*mobs[idx], *mobs[other_idx]);
+        if (winstate != PLAYING) {
+            break;
+        }
+
+        idx = uniform_dist(generator);
+        other_idx = (idx + 1) % 2;
+        (*mobs[idx]).update_status(time_step, print_details);
+
+        //Check if applied dots killed the mob
+        winstate = get_win_state(*mobs[idx], *mobs[other_idx]);
+        if (winstate != PLAYING) {
+            break;
+        }
+
+        (*mobs[other_idx]).update_status(time_step, print_details);
+
+        //Check if applied dots killed the mob
+        winstate = get_win_state(*mobs[idx], *mobs[other_idx]);
+        if (winstate != PLAYING) {
+            break;
+        }
+
+        if (pause_on) {
+            this_thread::sleep_for(chrono::milliseconds(time_step));
+        }
+        round += 1;
+    }
+
+    if (print_details) { cout << "-----------------------------------------------------------------------------------------------------------" << endl; }
+
     return winstate;
 }
 
