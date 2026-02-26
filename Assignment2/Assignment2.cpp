@@ -318,16 +318,18 @@ WinState get_win_state(Mob mob1, Mob mob2) {
 
 WinState mob_battle(Mob& mob1, Mob& mob2, bool pause_on, const unsigned int seed, bool print_details) {
 
-    WinState winstate = PLAYING;
+    //Initialise probability distributions
     mt19937 generator(seed);
-    Mob* mobs[2] = { &mob1, &mob2 };
-
     uniform_int_distribution<int> uniform_damage_rating(10, 25);
     uniform_int_distribution<int> uniform_dist(0, 1);
     bernoulli_distribution special_effect(0.3);
     bernoulli_distribution bernoulli_dist_crit_mob2(mob2.crit_strike_chance);
     bernoulli_distribution bernoulli_dist_dot_mob1(mob1.dot_chance);
     bernoulli_distribution bernoulli_dist_dot_mob2(mob2.dot_chance);
+
+    //Initialise state and mob array
+    WinState winstate = PLAYING;
+    Mob* mobs[2] = { &mob1, &mob2 };
 
     int time_step = 1000;
     int round = 1;
@@ -358,10 +360,6 @@ WinState mob_battle(Mob& mob1, Mob& mob2, bool pause_on, const unsigned int seed
         mob1.dot_next_attack = bernoulli_dist_dot_mob1(generator);
         mob2.dot_next_attack = bernoulli_dist_dot_mob1(generator);
 
-        //Randomly determine who attacks first (Uniform: Equal probability of each mob attacking first)
-        int idx = uniform_dist(generator);
-        int other_idx = (idx + 1) % 2;
-
         if (print_details) {
             cout << "-----------------------------------------------------------------------------------------------------------" << endl;
             cout << "ATTACK ROUND: " << round << " " << endl;
@@ -372,6 +370,10 @@ WinState mob_battle(Mob& mob1, Mob& mob2, bool pause_on, const unsigned int seed
         if (pause_on) {
             this_thread::sleep_for(chrono::milliseconds(2 * time_step));
         }
+
+        //Randomly determine who attacks first (Uniform: Equal probability of each mob attacking first)
+        int idx = uniform_dist(generator);
+        int other_idx = (idx + 1) % 2;
 
         (*mobs[idx]).attack((*mobs[other_idx]), time_step, pause_on, print_details);
 
@@ -451,8 +453,6 @@ void print_battle_statistics(vector <WinState> win_array) {
     cout << "...as expected, Hogger is brutal." << endl;
     cout << "-----------------------------------------------------------------------------------------------------------";
 }
-
-
 
 int main()
 {
